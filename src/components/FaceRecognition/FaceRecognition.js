@@ -10,22 +10,22 @@ const FaceRecognition = ({ box, imageUrl }) => {
   let face_to_insert, container_block;
 
   console.log("component outside: ", box.boxEdge);
+  container_block = document.getElementById("container");
+
+  let remove_child = document.querySelectorAll(".bounding-box");
+
+  for (let i = 0; i < remove_child.length; i++) {
+    let item = document.querySelector(".bounding-box");
+    container_block.removeChild(item);
+  }
 
   if (box.boxEdge !== undefined) {
-    console.log("component: ", box.boxEdge);
+    console.log("component inside: ", box.boxEdge);
     boxLeft = box.boxEdge.leftCol;
     boxRight = box.boxEdge.rightCol;
     boxTop = box.boxEdge.topRow;
     boxBottom = box.boxEdge.bottomRow;
     faceNum = box.boxEdge.leftCol.length;
-    container_block = document.getElementById("container");
-
-    let remove_child = document.querySelectorAll(".bounding-box");
-
-    for (let i = 0; i < remove_child.length; i++) {
-      let item = document.querySelector(".bounding-box");
-      container_block.removeChild(item);
-    }
 
     // console.log("remove: ", remove_child.length);
 

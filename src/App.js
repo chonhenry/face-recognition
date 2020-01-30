@@ -21,41 +21,46 @@ class App extends Component {
   }
 
   calculateFaceLocation = data => {
-    const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById("inputimage");
-    const width = Number(image.width);
-    const height = Number(image.height);
-    const faceNum = data.outputs[0].data.regions.length;
     const boxEdge = { leftCol: [], topRow: [], rightCol: [], bottomRow: [] };
-    // console.log(faceNum);
+    if ("regions" in data.outputs[0].data) {
+      // const clarifaiFace =
+      //   data.outputs[0].data.regions[0].region_info.bounding_box;
+      console.log("api", data);
+      const image = document.getElementById("inputimage");
+      const width = Number(image.width);
+      const height = Number(image.height);
+      const faceNum = data.outputs[0].data.regions.length;
 
-    for (let i = 0; i < faceNum; i++) {
-      boxEdge.leftCol.push(
-        data.outputs[0].data.regions[i].region_info.bounding_box.left_col *
-          width
-      );
-      boxEdge.topRow.push(
-        data.outputs[0].data.regions[i].region_info.bounding_box.top_row *
-          height
-      );
-      boxEdge.rightCol.push(
-        width -
-          data.outputs[0].data.regions[i].region_info.bounding_box.right_col *
+      // console.log(faceNum);
+
+      for (let i = 0; i < faceNum; i++) {
+        boxEdge.leftCol.push(
+          data.outputs[0].data.regions[i].region_info.bounding_box.left_col *
             width
-      );
-      boxEdge.bottomRow.push(
-        height -
-          data.outputs[0].data.regions[i].region_info.bounding_box.bottom_row *
+        );
+        boxEdge.topRow.push(
+          data.outputs[0].data.regions[i].region_info.bounding_box.top_row *
             height
-      );
+        );
+        boxEdge.rightCol.push(
+          width -
+            data.outputs[0].data.regions[i].region_info.bounding_box.right_col *
+              width
+        );
+        boxEdge.bottomRow.push(
+          height -
+            data.outputs[0].data.regions[i].region_info.bounding_box
+              .bottom_row *
+              height
+        );
+      }
+
+      return {
+        boxEdge
+      };
+    } else {
+      return boxEdge;
     }
-
-    // console.log("calculate: ", boxEdge);
-
-    return {
-      boxEdge
-    };
   };
 
   displayFaceBox = box => {
@@ -72,6 +77,7 @@ class App extends Component {
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
+        console.log("response: ", response);
         this.displayFaceBox(this.calculateFaceLocation(response));
         //console.log(response);
       })
