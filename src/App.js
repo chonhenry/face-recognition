@@ -26,30 +26,55 @@ class App extends Component {
     const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
+    const faceNum = data.outputs[0].data.regions.length;
+    const boxEdge = { leftCol: [], topRow: [], rightCol: [], bottomRow: [] };
+    // console.log(faceNum);
+
+    for (let i = 0; i < faceNum; i++) {
+      boxEdge.leftCol.push(
+        data.outputs[0].data.regions[i].region_info.bounding_box.left_col *
+          width
+      );
+      boxEdge.topRow.push(
+        data.outputs[0].data.regions[i].region_info.bounding_box.top_row *
+          height
+      );
+      boxEdge.rightCol.push(
+        width -
+          data.outputs[0].data.regions[i].region_info.bounding_box.right_col *
+            width
+      );
+      boxEdge.bottomRow.push(
+        height -
+          data.outputs[0].data.regions[i].region_info.bounding_box.bottom_row *
+            height
+      );
+    }
+
+    // console.log("calculate: ", boxEdge);
+
     return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - clarifaiFace.right_col * width,
-      bottomRow: height - clarifaiFace.bottom_row * height
+      boxEdge
     };
   };
 
   displayFaceBox = box => {
-    console.log(box);
     this.setState({ box: box });
+    // console.log("state box: ", this.state.box);
   };
 
   onInputChange = event => {
     this.setState({ input: event.target.value });
   };
 
-  onButtonSubmit = () => {
+  onButtonSubmit = event => {
     this.setState({ imageUrl: this.state.input });
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then(response =>
-        this.displayFaceBox(this.calculateFaceLocation(response))
-      )
+      .then(response => {
+        this.displayFaceBox(this.calculateFaceLocation(response));
+        //console.log(response);
+      })
       .catch(err => console.log(err));
   };
 
